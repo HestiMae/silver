@@ -3,9 +3,12 @@ import XLSX, { CellObject, WorkSheet } from "xlsx";
 export default class xlUtil {
 
   static ec = (r, c) => XLSX.utils.encode_cell({ r: r, c: c });
+  static er = (s, e) => XLSX.utils.encode_range(s, e);
+  static erc = (sr, sc, er, ec) => XLSX.utils.encode_range({ r: sr, c: sc }, { r: er, c: ec });
+  static used_range = (s) => XLSX.utils.decode_range(s["!ref"]);
 
   static filter_sheet(sheet: WorkSheet, header: string, filterValue: string) {
-    let range = XLSX.utils.decode_range(sheet["!ref"])
+    let range = this.used_range(sheet)
     let column = this.range_to_array(sheet, this.header_search(sheet, range, "station"), 1);
     let filter_rows: Array<number> = [];
     column.forEach((value, i) => {if (value != filterValue) {filter_rows.push(range.s.r + i + 1)}})
@@ -16,7 +19,7 @@ export default class xlUtil {
   }
 
   static delete_many_rows(sheet: WorkSheet, row_index: Array<number>) {
-    let range = XLSX.utils.decode_range(sheet["!ref"]);
+    let range = this.used_range(sheet);
     let deletedRows = 0;
     console.log(row_index)
     for (let row = range.s.r; row <= range.e.r; row++) {
@@ -30,7 +33,7 @@ export default class xlUtil {
         }
       }
     }
-    sheet["!ref"] = XLSX.utils.encode_range(range.s, {r:range.e.r - deletedRows - 1, c:range.e.c});
+    sheet["!ref"] = this.erc(range.s.r, range.s.c, range.e.r - deletedRows - 1, range.e.c);
     console.log("Deleted " + deletedRows.toString() + " rows - old end " + range.e.r + " new end" + (range.e.r - deletedRows))
   }
 
@@ -42,18 +45,25 @@ export default class xlUtil {
   }
 
   static header_search(sheet: XLSX.WorkSheet, range: XLSX.Range, header: string): XLSX.Range {
+    return this.header_search_multi(sheet, range, [header])[0]
+  }
+
+  static header_search_multi(sheet: XLSX.WorkSheet, range: XLSX.Range, header: Array<string>): Array<XLSX.Range> {
+    let outArray = new Array<XLSX.Range>(header.length)
     for (let column = range.s.c; column < range.e.c; column++) {
-      let cell: XLSX.CellObject = sheet[XLSX.utils.encode_cell({ r: range.s.r, c: column })];
-      if (cell.v.toString() == header) {
-        return { s: { r: range.s.r, c: column }, e: { r: range.e.r, c: column } };
+      let cell: XLSX.CellObject = sheet[this.ec(range.s.r, column)];
+      let index = header.findIndex(value => value == cell.v.toString());
+      if (index != -1) {
+        outArray[index] = { s: { r: range.s.r, c: column }, e: { r: range.e.r, c: column } };
       }
     }
+    return outArray
   }
 
   static range_to_array(sheet: XLSX.WorkSheet, range: XLSX.Range, offset: number): Array<string> {
     let rangeArray = [];
     for (let row = range.s.r + offset; row < range.e.r; row++) {
-      let cell: XLSX.CellObject = sheet[XLSX.utils.encode_cell({ r: row, c: range.s.c })];
+      let cell: XLSX.CellObject = sheet[this.ec(row, range.s.c)];
       rangeArray.push(this.get_cell_value(cell));
     }
     return rangeArray;

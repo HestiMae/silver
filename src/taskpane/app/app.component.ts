@@ -5,20 +5,23 @@ import "../../../assets/icon-32.png";
 import "../../../assets/icon-80.png";
 
 import fileDialog from "file-dialog";
+
 import xlUtil from "./xlUtil";
 import XLSX from "xlsx";
 import DocumentCreated = Word.DocumentCreated;
 import {Base64} from "js-base64";
 import InsertLocation = Word.InsertLocation;
 import context = Office.context;
+import SilverField from "./SilverField";
 import application from "@angular-devkit/build-angular/src/babel/presets/application";
-
 /* global console, Excel, require */
 
 interface Station {
     id: string;
     name: string;
 }
+
+const fields_json = require('./resources/fields.json')
 
 
 @Component({
@@ -162,5 +165,10 @@ export default class AppComponent implements OnInit {
         } catch (error) {
             console.error(error);
         }
+    }
+
+    async extract_data()
+    {
+
     }
 }
