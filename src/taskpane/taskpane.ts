@@ -4,6 +4,8 @@
  */
 import "zone.js"; // Required for Angular
 import { platformBrowserDynamic } from "@angular/platform-browser-dynamic";
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import AppModule from "./app/app.module";
 /* global console, document, Office */
 
