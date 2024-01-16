@@ -30,8 +30,8 @@
               "/assets"
             ],
             "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-              "src/taskpane/taskpane.css"
+              "../node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "taskpane.css"
             ],
             "scripts": []
           },
@@ -98,13 +98,18 @@
               "/assets"
             ],
             "styles": [
-              "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-              "src/taskpane/taskpane.css"
+              "../node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "taskpane.css"
             ],
             "scripts": []
           }
         }
       }
+    }
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "style": "css"
     }
   },
   "defaultProject": "silver"

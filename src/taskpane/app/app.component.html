@@ -4,42 +4,32 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-  <link href="../../../node_modules/@angular/material/prebuilt-themes/indigo-pink.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <title>Silver Macros</title>
 </head>
 <mat-tab-group dynamicHeight>
   <mat-tab label="Merge" >
     <h2>Xivic Station Merge/Split</h2>
-    <button mat-raised-button class="mat-primary" (click)="select_files()">Select Files</button>
-    <br />
-    <br />
-    <br />
+    <button mat-raised-button color="primary" (click)="select_files()">Select Files</button>
     <mat-form-field appearance="fill">
-      <select matNativeControl required [disabled]="disableSelect" [(ngModel)]="stationSelected" name="station">
-        <option *ngFor="let station of stations" [value]="station.id">
+      <mat-label>Select Station</mat-label>
+      <mat-select placeholder="Pick an Export First!" [disabled]="disableSelect" [(ngModel)]="stationSelected" name="station">
+        <mat-option *ngFor="let station of stations" [value]="station.id">
           {{station.name}}
-        </option>
-      </select>
+        </mat-option>
+      </mat-select>
     </mat-form-field>
-    <br />
-    <br />
-    <br />
-    <button mat-raised-button class="mat-accent" (click)="save_workbook()">Save Workbook</button>
-    <br />
+    <button mat-raised-button color="accent" (click)="save_workbook()">Save Workbook</button>
   </mat-tab>
   <mat-tab label="Autofill">
-    <button mat-raised-button class="mat-accent" (click)="test_excel()">Test Excel</button>
-    <button mat-raised-button class="mat-accent" (click)="test_word()">Test Word</button>
+    <a mat-raised-button color="accent" disableRipple="false" (click)="pick_template()">Pick Template</a>
+    <button mat-raised-button color="accent" (click)="test_word()">Re-Save</button>
+    <button mat-raised-button color="accent" (click)="initialize_binding()">Bind Fields</button>
+    <mat-form-field appearance="fill">
+      <mat-label>Station Name</mat-label>
+      <input matInput placeholder="Traralgon" [(ngModel)]="field_stationName">
+    </mat-form-field>
+    <button mat-raised-button color="accent" (click)="set_binding()">Fill Fields</button>
   </mat-tab>
   <mat-tab label="Summary">[WIP]</mat-tab>
 </mat-tab-group>
-
-<!--<mat-form-field appearance="fill">-->
-<!--  <mat-select placeholder="Select a Station" [(value)]="stationSelected" disableOptionCentering>-->
-<!--    <div style="::ng-deep">-->
-<!--    <mat-option *ngFor="let station of stations" [value]="station.id">-->
-<!--      {{station.name}}-->
-<!--    </mat-option>-->
-<!--    </div>-->
-<!--  </mat-select>-->
-<!--</mat-form-field>-->

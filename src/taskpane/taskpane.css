@@ -2,4 +2,4 @@
  * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
  * See LICENSE in the project root for license information.
  */
-@import '~@angular/material/prebuilt-themes/indigo-pink.css';
+@import "/node_modules/@angular/material/prebuilt-themes/indigo-pink.css";

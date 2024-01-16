@@ -29,9 +29,9 @@ const modules = [
 ];
 
 @NgModule({
-  declarations: [AppComponent],
-  imports: [...modules, BrowserAnimationsModule],
+  imports: [...modules],
   exports: [...modules],
+  declarations: [AppComponent],
   bootstrap: [AppComponent],
 })
 export default class AppModule {}
