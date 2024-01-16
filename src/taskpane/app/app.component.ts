@@ -10,6 +10,8 @@ import XLSX from "xlsx";
 import DocumentCreated = Word.DocumentCreated;
 import {Base64} from "js-base64";
 import InsertLocation = Word.InsertLocation;
+import context = Office.context;
+import application from "@angular-devkit/build-angular/src/babel/presets/application";
 
 /* global console, Excel, require */
 
@@ -33,7 +35,6 @@ export default class AppComponent implements OnInit {
     newDocumentBase64: string;
     field_stationName: string;
     NameBinding: Office.TextBinding;
-    VITBinding: Office.TableBinding;
 
 
     ngOnInit() {
@@ -128,7 +129,12 @@ export default class AppComponent implements OnInit {
 
     async set_binding() {
         this.NameBinding.setDataAsync(this.field_stationName)
-        this.VITBinding.addRowsAsync([["Cool", "Nice", "Sweet", "Good"]])
+        await Word.run(async (context) => {
+            let tables = context.document.body.tables
+            context.load(tables)
+            tables.getFirst().addRows(InsertLocation.end, 1, [["Cool", "Nice", "Sweet", "Good"]])
+            await context.sync().catch((e) => console.error(e));
+        });
     }
 
     async initialize_binding() {
@@ -137,25 +143,21 @@ export default class AppComponent implements OnInit {
                 if (result.status == Office.AsyncResultStatus.Failed) console.log(result.error.message)
                 this.NameBinding = result.value
             }));
-            Office.context.document.bindings.addFromNamedItemAsync("Bind_VIT", Office.BindingType.Table, {id: "Bind_VIT"}, (result => {
-                if (result.status == Office.AsyncResultStatus.Failed) console.log(result.error.message)
-                this.VITBinding = result.value as Office.TableBinding
-            }));
         } catch (error) {
             console.error(error)
         }
     }
 
-    async test_word() {
+    async save_document() {
         try {
             await Word.run(async (context) => {
                 let newDocument: DocumentCreated = context.application.createDocument(this.newDocumentBase64)
-                newDocument.properties.customProperties.getItem("AF_StationName").value = this.stationSelected
-                let nameParagraph = newDocument.body.insertParagraph(this.stationSelected + "_REV0", InsertLocation.start)
+                //newDocument.properties.customProperties.getItem("AF_StationName").value = this.stationSelected
+                let nameParagraph = newDocument.body.insertParagraph((this.field_stationName + "_REV0"), InsertLocation.start)
                 newDocument.save()
                 nameParagraph.delete()
                 newDocument.open()
-                await context.sync();
+                await context.sync().catch((e) => console.error(e));
             });
         } catch (error) {
             console.error(error);
