@@ -9,10 +9,9 @@ export default class xlUtil {
 
   static filter_sheet(sheet: WorkSheet, header: string, filterValue: string) {
     let range = this.used_range(sheet)
-    let column = this.range_to_array(sheet, this.header_search(sheet, range, "station"), 1);
+    let column = this.range_to_string_array(sheet, this.header_search(sheet, range, "station"), 1);
     let filter_rows: Array<number> = [];
     column.forEach((value, i) => {if (value != filterValue) {filter_rows.push(range.s.r + i + 1)}})
-    console.log("Matching Rows: " + (column.length - filter_rows.length))
     if (filter_rows.length > 0) {
       this.delete_many_rows(sheet, filter_rows)
     }
@@ -21,7 +20,6 @@ export default class xlUtil {
   static delete_many_rows(sheet: WorkSheet, row_index: Array<number>) {
     let range = this.used_range(sheet);
     let deletedRows = 0;
-    console.log(row_index)
     for (let row = range.s.r; row <= range.e.r; row++) {
       if (row == row_index[deletedRows]) {
         deletedRows += 1
@@ -34,7 +32,6 @@ export default class xlUtil {
       }
     }
     sheet["!ref"] = this.erc(range.s.r, range.s.c, range.e.r - deletedRows - 1, range.e.c);
-    console.log("Deleted " + deletedRows.toString() + " rows - old end " + range.e.r + " new end" + (range.e.r - deletedRows))
   }
 
   static get_cell_value(cell: CellObject): string {
@@ -42,6 +39,15 @@ export default class xlUtil {
       return "";
     }
     return cell.v.toString();
+  }
+
+  static get_cell_value_numeric(cell: CellObject): number
+  {
+    if (cell == undefined || cell.t != "n")
+    {
+      return -1;
+    }
+    return cell.v as number
   }
 
   static header_search(sheet: XLSX.WorkSheet, range: XLSX.Range, header: string): XLSX.Range {
@@ -52,7 +58,7 @@ export default class xlUtil {
     let outArray = new Array<XLSX.Range>(header.length)
     for (let column = range.s.c; column < range.e.c; column++) {
       let cell: XLSX.CellObject = sheet[this.ec(range.s.r, column)];
-      let index = header.findIndex(value => value == cell.v.toString());
+      let index = header.findIndex(value => value == this.get_cell_value(cell));
       if (index != -1) {
         outArray[index] = { s: { r: range.s.r, c: column }, e: { r: range.e.r, c: column } };
       }
@@ -60,11 +66,19 @@ export default class xlUtil {
     return outArray
   }
 
-  static range_to_array(sheet: XLSX.WorkSheet, range: XLSX.Range, offset: number): Array<string> {
+  static range_to_string_array(sheet: XLSX.WorkSheet, range: XLSX.Range, offset: number): Array<string> {
     let rangeArray = [];
     for (let row = range.s.r + offset; row < range.e.r; row++) {
       let cell: XLSX.CellObject = sheet[this.ec(row, range.s.c)];
       rangeArray.push(this.get_cell_value(cell));
+    }
+    return rangeArray;
+  }
+  static range_to_number_array(sheet: XLSX.WorkSheet, range: XLSX.Range, offset: number): Array<number> {
+    let rangeArray = [];
+    for (let row = range.s.r + offset; row < range.e.r; row++) {
+      let cell: XLSX.CellObject = sheet[this.ec(row, range.s.c)];
+      rangeArray.push(this.get_cell_value_numeric(cell));
     }
     return rangeArray;
   }

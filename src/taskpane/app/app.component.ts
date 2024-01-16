@@ -31,6 +31,7 @@ const fields_json = require('./resources/fields.json')
 export default class AppComponent implements OnInit {
     @ViewChild('stationSelect') stationSelect: ViewChild
     stations: Station[];
+    fields: Array<SilverField> =[];
     welcomeMessage = "Silver";
     mergeWorkbook: XLSX.WorkBook;
     stationSelected: string;
@@ -43,6 +44,7 @@ export default class AppComponent implements OnInit {
     ngOnInit() {
         this.stationSelected = "[Export All]";
         this.disableSelect = true;
+        Array.prototype.forEach.call(fields_json, (field) => this.fields.push(Object.assign(new SilverField(), field)))
     }
 
     async select_files() {
@@ -62,10 +64,10 @@ export default class AppComponent implements OnInit {
                     // Populate
                     let sheet: XLSX.WorkSheet = this.mergeWorkbook.Sheets["station_audit"];
                     let idRange = xlUtil.header_search(sheet, XLSX.utils.decode_range(sheet["!ref"]), "station"); // Keyed by name rn
-                    let idArray = xlUtil.range_to_array(sheet, idRange, 1);
+                    let idArray = xlUtil.range_to_string_array(sheet, idRange, 1);
 
                     let nameRange = xlUtil.header_search(sheet, XLSX.utils.decode_range(sheet["!ref"]), "station");
-                    let nameArray = xlUtil.range_to_array(sheet, nameRange, 1);
+                    let nameArray = xlUtil.range_to_string_array(sheet, nameRange, 1);
 
                     this.stations = [{id: "[Export All]", name: "[Export All]"}];
                     this.stations = this.stations.concat(idArray.map((element, i) => ({
@@ -168,7 +170,13 @@ export default class AppComponent implements OnInit {
     }
 
     async extract_data()
-    {
-
+    { //TODO: one line headers
+        this.mergeWorkbook.SheetNames.forEach((sheetName) => {
+            let sheet = this.mergeWorkbook.Sheets[sheetName];
+            let matchedFields = this.fields.filter((field) => field.sheet_name == sheetName)
+            let headers: Array<string> =[]
+            matchedFields.forEach((match) => headers.push(match.field_name))
+            xlUtil.header_search_multi(sheet, xlUtil.used_range(sheet), headers).forEach((range, i) => matchedFields[i].set_data(range, sheet));
+        })
     }
 }

@@ -16,6 +16,7 @@
     "prettier/prettier": ["warn", { "endOfLine": "auto" }]
   },
   "extends": [
-    "eslint-config-office-addins"
+    "eslint-config-office-addins",
+    "plugin:json/recommended"
   ]
 }
