@@ -12,11 +12,11 @@
     },
     "project": "./tsconfig.json"
   },
-  "rules": {
-    "prettier/prettier": ["warn", { "endOfLine": "auto" }]
-  },
   "extends": [
-    "eslint-config-office-addins",
+    "eslint:recommended",
     "plugin:json/recommended"
-  ]
+  ],
+  "rules": {
+    "no-redeclare": "off"
+  }
 }

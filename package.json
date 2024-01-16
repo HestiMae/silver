@@ -18,7 +18,6 @@
     "dev-server": "webpack serve --mode development",
     "lint": "office-addin-lint check",
     "lint:fix": "office-addin-lint fix",
-    "prettier": "office-addin-lint prettier",
     "start": "office-addin-debugging start manifest.xml",
     "start:desktop": "office-addin-debugging start manifest.xml desktop",
     "start:web": "office-addin-debugging start manifest.xml web",
@@ -79,12 +78,10 @@
     "office-addin-dev-certs": "^1.5.21",
     "office-addin-lint": "^1.2.2",
     "office-addin-manifest": "^1.5.25",
-    "office-addin-prettier-config": "^1.0.16",
     "source-map-loader": "^3.0.0",
     "ts-loader": "^9.2.3",
     "webpack": "^5.39.1",
     "webpack-cli": "^4.7.2",
     "webpack-dev-server": "^3.11.2"
-  },
-  "prettier": "office-addin-prettier-config"
+  }
 }
