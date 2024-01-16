@@ -111,15 +111,17 @@ namespace SilverField {
       booleanCountIf = "booleanCountIf",
       numericSum = "numericSum",
       booleanAny = "booleanAny",
-      booleanAll = "booleanAll"
+      booleanAll = "booleanAll",
+      stringConcat = "stringConcat"
     }
 
     export const reduceFunctions: Map<OpReduce, (acc: string | number | boolean, val: string | number | boolean) => string | number | boolean> = new Map([
-      [OpReduce.count, (acc, val) => (acc as number) + 1],
+      [OpReduce.count, (acc, _) => (acc as number) + 1],
       [OpReduce.booleanCountIf, (acc, val) => (acc as number) + (val ? 1 : 0)],
       [OpReduce.numericSum, (acc, val) => (acc as number) + (val as number)],
       [OpReduce.booleanAll, (acc, val) => (acc) && (val)],
-      [OpReduce.booleanAny, (acc, val) => (acc) || (val)]
+      [OpReduce.booleanAny, (acc, val) => (acc) || (val)],
+      [OpReduce.stringConcat, (acc, val) => `${acc}\n${val}`]
     ])
   }
 
@@ -133,57 +135,69 @@ namespace SilverField {
 
     textBinding: Office.Binding
 
-    bind() {
-      switch (this.method) {
-        case SilverField.FieldOutput.OutputMethod.documentProperty:
-          return
-        case SilverField.FieldOutput.OutputMethod.textField:
-          try {
-            Office.context.document.bindings.addFromNamedItemAsync(this.destinationName, Office.BindingType.Text, { id: this.destinationName }, (result => {
-              if (result.status == Office.AsyncResultStatus.Failed) {
-                console.log(result.error.message)
-              } else {
-                this.textBinding = result.value
-              }
-            }))
-          } catch (error) {
-            console.error(error)
-          }
-          return
-        case SilverField.FieldOutput.OutputMethod.tableRow:
-          return
+    bind(): Promise<boolean> {
+      if (!this.textBinding) {
+        switch (this.method) {
+          case FieldOutput.OutputMethod.textField:
+            return new Promise<boolean>(resolve => {
+              wordUtil.bindTextPromise(this.destinationName).then((value) => {
+                this.textBinding = value
+                resolve(true)
+              }).catch((error) => {
+                console.error(error)
+                resolve(false)
+              })
+            })
+        }
+        return Promise.resolve(true)
+      } else {
+        return Promise.resolve(true)
       }
     }
 
     outputAsync(outValue: Array<string> | string): boolean {
       switch (this.method) {
-        case SilverField.FieldOutput.OutputMethod.documentProperty:
+        case FieldOutput.OutputMethod.documentProperty:
           return false
-        case SilverField.FieldOutput.OutputMethod.textField:
+        case FieldOutput.OutputMethod.textField:
           this.textBinding.setDataAsync(outValue)
           return true
-        case SilverField.FieldOutput.OutputMethod.tableRow:
+        case FieldOutput.OutputMethod.card:
           return false
       }
+      return true
     }
 
-    async outputWord(context: Word.RequestContext, outValue: Array<string> | string) {
-      switch (this.method) {
-        case SilverField.FieldOutput.OutputMethod.documentProperty:
-          return
-        case SilverField.FieldOutput.OutputMethod.textField:
-          return
-        case SilverField.FieldOutput.OutputMethod.tableRow:
-          let tables = context.document.body.tables
-          context.load(tables)
-          tables.items.forEach((table) => {
-            if (table.getCell(0, 0).value == this.destinationName) { // Absolutely rubbish method. Can't access table title
-              table.addRows(Word.InsertLocation.end, 1, [Array.from(outValue.toString().repeat(table.rows.items[0].cellCount))])
+    async outputWord(context: Word.RequestContext, outValue: Array<string> | string): Promise<boolean> {
+      try {
+        switch (this.method) {
+          case FieldOutput.OutputMethod.documentProperty:
+            return Promise.resolve(false)
+          case FieldOutput.OutputMethod.tableRow:
+            let tables = context.document.body.tables
+            context.load(tables)
+            await context.sync()
+            for (const table of tables.items) {
+              let firstCell = table.getCell(0, 0)
+              context.load(firstCell)
+              await context.sync()
+              if (firstCell.value == this.destinationName) {
+                let tableRows = table.rows
+                context.load(tableRows)
+                await context.sync()
+                //table.addRows(Word.InsertLocation.end, 1, [Array.from(outValue.toString().repeat(tableRows.items[table.rowCount - 1].cellCount))])
+                table.addRows(Word.InsertLocation.end, 1, [[outValue.toString(),outValue.toString(),outValue.toString()]])
+              }
             }
-          })
-          await context.sync().catch((e) => console.error(e))
-          return
+            await context.sync().catch((e) => console.error(e))
+            return Promise.resolve(true)
+        }
+      } catch (error) {
+        console.error(error)
+        return Promise.resolve(false)
       }
+
+      return Promise.resolve(true)
     }
   }
 
@@ -192,6 +206,7 @@ namespace SilverField {
       documentProperty = "documentProperty",
       textField = "textField",
       tableRow = "tableRow",
+      card = "card"
     }
   }
 }

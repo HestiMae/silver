@@ -3,3 +3,55 @@
  * See LICENSE in the project root for license information.
  */
 @import "/node_modules/@angular/material/prebuilt-themes/indigo-pink.css";
+
+.mat-card {
+    background-color: #DDDDDD;
+}
+
+.mat-card-content {
+    background-color: #FFFFFF;
+    padding: 1rem;
+}
+
+.mat-button {
+}
+
+.mat-form-field {
+    margin-bottom: 0;
+}
+
+.mat-tab-group {
+    width: 100%;
+}
+
+html, body {
+    height: 100vh;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+}
+
+.mat-tab {
+    width: 100%;
+}
+
+.tab-content {
+    padding: 1rem;
+    overflow: scroll;
+    height: 90vh;
+}
+
+.statusbar {
+    margin-top: auto;
+    width: 100%;
+    min-height: 1rem;
+    padding-left: 1rem;
+    padding-top: 0.5rem;
+    position: fixed;
+    bottom: 0;
+    background-color: #BBBBBB;
+}
+

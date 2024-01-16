@@ -7,33 +7,108 @@
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <title>Silver Macros</title>
 </head>
-<mat-tab-group dynamicHeight>
-  <mat-tab label="Merge" >
-    <h2>Xivic Station Merge/Split</h2>
-    <button mat-raised-button color="primary" (click)="select_files()">Select Files</button>
-    <mat-form-field appearance="fill">
-      <mat-label>Select Station</mat-label>
-      <mat-select placeholder="Pick an Export First!" [disabled]="disableSelect" [(ngModel)]="stationSelected" name="station">
-        <mat-option *ngFor="let station of stations" [value]="station.id">
-          {{station.name}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    <button mat-raised-button color="accent" (click)="filter_workbook()">Filter Workbook</button>
-    <button mat-raised-button color="accent" (click)="save_workbook()">Save Workbook</button>
-    <br/>
-    <br/>
-    <button mat-raised-button color="accent" (click)="extract_data()">Extract Data</button>
-    <br/>
-    <br/>
-    <button mat-raised-button color="accent" (click)="initialize_binding()">Bind Fields</button>
-    <button mat-raised-button color="accent" (click)="set_binding()">Fill Fields</button>
-
+<body>
+<mat-tab-group backgroundColor="primary">
+  <mat-tab label="Import">
+    <div class="tab-content">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Import Data</mat-card-title>
+          <mat-card-subtitle>Xivic Station Merge/Split</mat-card-subtitle>
+        </mat-card-header>
+        <div>
+          <mat-card-content>
+            1.
+            <button mat-raised-button color="primary" [disabled]="mergeWorkbook" (click)="import_csvs()">Import From
+              CSVs
+            </button>
+            Or
+            <button mat-raised-button color="primary" [disabled]="mergeWorkbook || true" (click)="import_xlsx()">Import From XLSX
+            </button>
+          </mat-card-content>
+          <mat-card-content>
+            2.
+            <mat-form-field appearance="fill">
+              <mat-label>Select Station</mat-label>
+              <mat-select placeholder="Pick an Export First!" [disabled]="!stations" [(ngModel)]="stationSelected"
+                          name="station">
+                <mat-option *ngFor="let station of stations" [value]="station.id">
+                  {{station.name}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            -
+            <button mat-raised-button color="accent" [disabled]="!stations" (click)="filter_workbook()">Filter
+              Workbook
+            </button>
+          </mat-card-content>
+          <mat-card-content>
+            3.
+            <button mat-raised-button color="accent" [disabled]="(!mergeWorkbook || stations || fields)"
+                    (click)="extract_data()">Extract Data
+            </button>
+          </mat-card-content>
+        </div>
+        <mat-card-actions align="end">
+          <button mat-button [disabled]="!mergeWorkbook" (click)="reset_workbook()">Reset Workbook</button>
+          <button mat-button [disabled]="!mergeWorkbook" (click)="save_workbook()">Save Workbook</button>
+        </mat-card-actions>
+      </mat-card>
+      <br />
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Autofill Document</mat-card-title>
+          <mat-card-subtitle>Insert data into fields</mat-card-subtitle>
+        </mat-card-header>
+        <div>
+          <mat-card-content>
+            1.
+            <button mat-raised-button color="accent" [disabled]="!fields" (click)="set_binding()">Fill Fields</button>
+          </mat-card-content>
+          <mat-card-actions align="end">
+            <button mat-button>Auto-Rename Document</button>
+          </mat-card-actions>
+        </div>
+      </mat-card>
+    </div>
   </mat-tab>
-  <mat-tab label="Autofill">
-    <a mat-raised-button color="accent" disableRipple="false" (click)="pick_template()">Pick Template</a>
-    <button mat-raised-button color="accent" (click)="save_document()">Re-Save</button>
+  <mat-tab label="Information">
+    <div class="tab-content">
+      <a mat-raised-button color="accent" disableRipple="false" (click)="pick_template()">Pick Template</a>
+      <button mat-raised-button color="accent" (click)="save_document()">Re-Save</button>
+      <br />
+      <br />
+      <mat-card>
+        <mat-card-header>
+          <div mat-card-avatar class="example-header-image"></div>
+          <mat-card-title>Shiba Inu</mat-card-title>
+          <mat-card-subtitle>Dog Breed</mat-card-subtitle>
+        </mat-card-header>
+        <img mat-card-image src="https://material.angular.io/assets/img/examples/shiba2.jpg"
+             alt="Photo of a Shiba Inu">
+        <div>
+          <mat-card-content>
+            <p>
+              The Shiba Inu is the smallest of the six original and distinct spitz breeds of dog from
+              Japan.
+              A small, agile dog that copes very well with mountainous terrain, the Shiba Inu was
+              originally
+              bred for hunting.
+            </p>
+          </mat-card-content>
+        </div>
+        <mat-card-actions>
+          <button mat-button>LIKE</button>
+          <button mat-button>SHARE</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
   </mat-tab>
-  <mat-tab label="Summary">[WIP]</mat-tab>
+  <mat-tab label="Summary">
+    <div class="tab-content">
+      [WIP]
+    </div>
+  </mat-tab>
 </mat-tab-group>
-<p style="position: fixed; bottom: 0;">{{statusBarText}}</p>
+<footer class="statusbar"><p>{{statusBarText}}</p></footer>
+</body>
