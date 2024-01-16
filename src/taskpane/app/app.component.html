@@ -1,18 +1,42 @@
-<header class="ms-welcome__header ms-bgColor-neutralLighter ms-u-fadeIn500">
-    <img width="90" height="90" src="../../../assets/logo-filled.png" alt="Contoso Task Pane Add-in" title="Contoso Task Pane Add-in" />
-    <h1 class="ms-fontSize-su ms-fnpm install eslint-config-office-addinsontWeight-light ms-fontColor-neutralPrimary">{{welcomeMessage}}</h1>
-</header>
-<main class="ms-welcome__main">
-    <button class="mat-raised-button mat-primary" (click)="select_files()">Select Files</button>
-    <div style="height:50pt">
-        <mat-form-field appearance="fill">
-            <mat-label>Station</mat-label>
-            <mat-select>
-                <mat-option *ngFor="let station of stations" [value]="station.id">
-                    {{station.name}}
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
-    </div>
-    <button class="mat-raised-button mat-accent" (click)="save_workbook()">Save Workbook</button>
-</main>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="../../../node_modules/@angular/material/prebuilt-themes/indigo-pink.css" rel="stylesheet">
+  <title>Silver Macros</title>
+</head>
+<mat-tab-group dynamicHeight>
+  <mat-tab label="Merge" >
+    <h2>Xivic Station Merge/Split</h2>
+    <button mat-raised-button class="mat-primary" (click)="select_files()">Select Files</button>
+    <br />
+    <br />
+    <br />
+    <mat-form-field appearance="fill">
+      <select matNativeControl required [disabled]="disableSelect" [(ngModel)]="stationSelected" name="station">
+        <option *ngFor="let station of stations" [value]="station.id">
+          {{station.name}}
+        </option>
+      </select>
+    </mat-form-field>
+    <br />
+    <br />
+    <br />
+    <button mat-raised-button class="mat-accent" (click)="save_workbook()">Save Workbook</button>
+    <br />
+  </mat-tab>
+  <mat-tab label="Autofill">[WIP]</mat-tab>
+  <mat-tab label="Summary">[WIP]</mat-tab>
+</mat-tab-group>
+
+<!--<mat-form-field appearance="fill">-->
+<!--  <mat-select placeholder="Select a Station" [(value)]="stationSelected" disableOptionCentering>-->
+<!--    <div style="::ng-deep">-->
+<!--    <mat-option *ngFor="let station of stations" [value]="station.id">-->
+<!--      {{station.name}}-->
+<!--    </mat-option>-->
+<!--    </div>-->
+<!--  </mat-select>-->
+<!--</mat-form-field>-->
