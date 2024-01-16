@@ -32,7 +32,7 @@ export default class xlUtil {
         }
       }
     }
-    sheet["!ref"] = this.erc(range.s.r, range.s.c, range.e.r - deletedRows - 1, range.e.c);
+    sheet["!ref"] = this.erc(range.s.r, range.s.c, range.e.r - deletedRows, range.e.c);
   }
 
   static get_cell_value(cell: CellObject): string {
@@ -57,7 +57,7 @@ export default class xlUtil {
 
   static header_search_multi(sheet: XLSX.WorkSheet, range: XLSX.Range, header: Array<string>): Array<XLSX.Range> {
     let outArray = new Array<XLSX.Range>(header.length)
-    for (let column = range.s.c; column < range.e.c; column++) {
+    for (let column = range.s.c; column <= range.e.c; column++) {
       let cell: XLSX.CellObject = sheet[this.ec(range.s.r, column)];
       let index = header.findIndex(value => value == this.get_cell_value(cell));
       if (index != -1) {
@@ -69,7 +69,7 @@ export default class xlUtil {
 
   static range_to_string_array(sheet: XLSX.WorkSheet, range: XLSX.Range, offset: number): Array<string> {
     let rangeArray = [];
-    for (let row = range.s.r + offset; row < range.e.r; row++) {
+    for (let row = range.s.r + offset; row <= range.e.r; row++) {
       let cell: XLSX.CellObject = sheet[this.ec(row, range.s.c)];
       rangeArray.push(this.get_cell_value(cell));
     }
@@ -77,7 +77,7 @@ export default class xlUtil {
   }
   static range_to_number_array(sheet: XLSX.WorkSheet, range: XLSX.Range, offset: number): Array<number> {
     let rangeArray = [];
-    for (let row = range.s.r + offset; row < range.e.r; row++) {
+    for (let row = range.s.r + offset; row <= range.e.r; row++) {
       let cell: XLSX.CellObject = sheet[this.ec(row, range.s.c)];
       rangeArray.push(this.get_cell_value_numeric(cell));
     }

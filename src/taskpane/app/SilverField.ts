@@ -44,6 +44,7 @@ namespace SilverField {
     falsyValue: string
 
     get_data(worksheet: XLSX.WorkSheet, range: XLSX.Range): Array<string | number> {
+      console.log(FieldOperation.getDataFunctions.get(FieldOperation.OpGetData.string)(worksheet, range, 0))
       return FieldOperation.getDataFunctions.get(this.operatorGetData)(worksheet, range, 1)
     }
 

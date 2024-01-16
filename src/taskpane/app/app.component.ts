@@ -172,7 +172,8 @@ export default class AppComponent implements OnInit {
       let matchedFields = this.fields.filter((field) => field.sheet_name == sheetName)
       let headers: Array<string> = []
       matchedFields.forEach((match) => headers.push(match.field_name))
-      xlUtil.header_search_multi(sheet, xlUtil.used_range(sheet), headers).forEach((range, i) => matchedFields[i].set_data(range, sheet))
+      let headerSearchResult = xlUtil.header_search_multi(sheet, xlUtil.used_range(sheet), headers)
+      headerSearchResult.forEach((range, i) => matchedFields[i].set_data(range, sheet))
     })
     this.statusBarText = `Found Data for ${this.fields.filter((field) => field.dataRange).length}/${this.fields.length} fields`
   }
