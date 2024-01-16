@@ -91,7 +91,27 @@ export default class AppComponent implements OnInit{
     }
   }
 
-  async run() {
+  async test_word() {
+    try {
+      await Word.run(async (context) => {
+        /**
+         * Insert your Word code here
+         */
+
+        // insert a paragraph at the end of the document.
+        const paragraph = context.document.body.insertParagraph("Hello World", Word.InsertLocation.end);
+
+        // change the paragraph color to blue.
+        paragraph.font.color = "blue";
+
+        await context.sync();
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  async test_excel() {
     try {
       await Excel.run(async (context) => {
         /**

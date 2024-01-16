@@ -14,6 +14,7 @@
   </AppDomains>
   <Hosts>
     <Host Name="Workbook"/>
+    <Host Name="Document"/>
   </Hosts>
   <DefaultSettings>
     <SourceLocation DefaultValue="https://localhost:3000/taskpane.html"/>
