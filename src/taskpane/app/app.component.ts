@@ -5,7 +5,6 @@ import XLSX from "xlsx"
 
 import SilverField from "./SilverField"
 import xlUtil from "./xlUtil"
-import { TypedJSON } from "typedjson"
 import wordUtil from "./wordUtil"
 
 /* global console, Excel, require */
@@ -39,13 +38,12 @@ export default class AppComponent implements OnInit {
     this.mergeWorkbook = undefined
     this.stations = undefined
     this.stationSelected = "Import Data First"
-    this.statusBarText = `Workbook Reset`
+    this.set_status(`Workbook Reset`)
   }
 
   load_fields() {
-    this.fields = []
-    Array.prototype.forEach.call(fields_json, (field) => this.fields.push(TypedJSON.parse(field, SilverField)))
-    this.statusBarText = `${this.fields.length} Field(s) Loaded`
+    this.fields = SilverField.fromJSON(fields_json)
+    this.set_status(`${this.fields.length} Field(s) Loaded`)
   }
 
   async import_csvs() {
@@ -82,6 +80,11 @@ export default class AppComponent implements OnInit {
     }
   }
 
+  set_status(text) {
+    this.statusBarText = text
+    console.log(text)
+  }
+
   populate_stations() {
     if (this.mergeWorkbook) {
       let sheet: XLSX.WorkSheet = this.mergeWorkbook.Sheets["station_audit"]
@@ -105,7 +108,7 @@ export default class AppComponent implements OnInit {
         return 0
       }))
 
-      this.statusBarText = `Export Loaded with ${this.stations.length} stations and ${this.mergeWorkbook.SheetNames.length} sheets`
+      this.set_status(`Export Loaded with ${this.stations.length} stations and ${this.mergeWorkbook.SheetNames.length} sheets`)
     }
   }
 
@@ -115,7 +118,7 @@ export default class AppComponent implements OnInit {
       if (this.stationSelected != "[Export All]") {
         this.mergeWorkbook.SheetNames.forEach((name) => filter_rows += xlUtil.filter_sheet(this.mergeWorkbook.Sheets[name], "station", this.stationSelected))
       }
-      this.statusBarText = `Filtered Export to '${this.stationSelected}', removing ${filter_rows} rows`
+      this.set_status(`Filtered Export to '${this.stationSelected}', removing ${filter_rows} rows`)
       this.stations = undefined
     }
   }
@@ -124,10 +127,10 @@ export default class AppComponent implements OnInit {
     if (this.mergeWorkbook) {
       try {
         XLSX.writeFile(this.mergeWorkbook, this.stationSelected + ".xlsx")
-        this.statusBarText = `Saved Export to ${this.stationSelected}.xlsx`
+        this.set_status(`Saved Export to ${this.stationSelected}.xlsx`)
       } catch (error) {
         console.error(error)
-        this.statusBarText = `WRITE ERROR: Failed to save export`
+        this.set_status(`WRITE ERROR: Failed to save export`)
       }
     }
   }
@@ -135,24 +138,19 @@ export default class AppComponent implements OnInit {
   async extract_data() {
     if (this.mergeWorkbook && !this.stations) {
       this.load_fields()
-      this.mergeWorkbook.SheetNames.forEach((sheetName) => {
-        let sheet = this.mergeWorkbook.Sheets[sheetName]
-        let matchedFields = this.fields.filter((field) => field.sheet_name == sheetName)
-        let headerSearchResult = xlUtil.header_search_multi(sheet, xlUtil.used_range(sheet), matchedFields.map((field) => field.field_name))
-        headerSearchResult.forEach((range, i) => matchedFields[i].set_data(range, sheet))
-      })
-      this.statusBarText = `Found Data for ${this.fields.filter((field) => field.dataRange).length}/${this.fields.length} fields`
+      SilverField.extract_field_ranges(this.fields, this.mergeWorkbook)
+      this.set_status(`Found Data for ${this.fields.filter((field) => field.outValue != undefined).length}/${this.fields.length} fields`)
     }
   }
 
   async set_binding() {
     if (this.fields) {
       Promise.all(this.fields.map((field) => field.output.bind())).then(async (bindSuccesses) => {
-        this.statusBarText = `Successfully bound ${bindSuccesses.filter(Boolean).length}/${this.fields.length} fields.`
-        let asyncSet = this.fields.map((field) => field.output.outputAsync(field.outValue)).filter(Boolean).length
-        this.statusBarText += ` Set Data for ${asyncSet}/${this.fields.length} text fields `
+        this.set_status(`Successfully bound ${bindSuccesses.filter(Boolean).length}/${bindSuccesses.filter((result) => result != null).length} fields.`)
+        let asyncSet = this.fields.map((field) => field.output.outputAsync(field.outValue))
+        this.statusBarText += ` Set Data for ${asyncSet.filter(Boolean).length}/${asyncSet.filter((result) => result != null).length} text fields `
         wordUtil.wordResultPromise((context: Word.RequestContext) => Promise.all(this.fields.map((field) => field.output.outputWord(context, field.outValue)))).then((setSuccesses) => {
-          this.statusBarText += `and ${setSuccesses.filter(Boolean).length}/${this.fields.length} other fields`
+          this.statusBarText += `and ${setSuccesses.filter(Boolean).length}/${setSuccesses.filter((result) => result != null).length} other fields`
         })
       })
     }

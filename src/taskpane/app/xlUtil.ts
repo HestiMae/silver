@@ -59,10 +59,11 @@ export default class xlUtil {
     let outArray = new Array<XLSX.Range>(header.length)
     for (let column = range.s.c; column <= range.e.c; column++) {
       let cell: XLSX.CellObject = sheet[this.ec(range.s.r, column)];
+
       let index = header.findIndex(value => value == this.get_cell_value(cell));
-      if (index != -1) {
-        outArray[index] = { s: { r: range.s.r, c: column }, e: { r: range.e.r, c: column } };
-      }
+      header.map((v, i) => ({v: v, i: i})).filter((e) => e.v == this.get_cell_value(cell)).forEach((e) => {
+        outArray[e.i] = { s: { r: range.s.r, c: column }, e: { r: range.e.r, c: column } };
+      })
     }
     return outArray
   }

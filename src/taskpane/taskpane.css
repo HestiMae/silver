@@ -41,7 +41,7 @@ body {
 .tab-content {
     padding: 1rem;
     overflow: scroll;
-    height: 90vh;
+    height: 80vh;
 }
 
 .statusbar {
