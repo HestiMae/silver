@@ -80,13 +80,13 @@ namespace SilverField {
     get_output_data(worksheet: XLSX.WorkSheet, output_range: XLSX.Range, filter_ranges: Array<XLSX.Range>): Array<string> | string {
       // Bad.
 
-      if (output_range == undefined){ // No Falsy Output - Column wasn't found.
+      if (output_range == undefined) { // No Falsy Output - Column wasn't found.
         return
       }
 
       let output_data = FieldTransformation.get_data(worksheet, output_range, this.opGetDataOutput)
       if (output_data.length == 0) {
-        return this.valOutputFalsy
+        return this.valOutputFalsy // No Rows
       }
       if (filter_ranges?.length ?? 0 > 0) {
         let filter_data = filter_ranges.map((range) => FieldTransformation.compare(FieldTransformation.get_data(worksheet, range, this.opGetDataFilters), this.opCompareFilters, this.valCompareFilters))
@@ -160,9 +160,18 @@ namespace SilverField {
       [OpReduce.stringConcat, (acc, val) => `${acc}\n${val}`]
     ])
 
+    const reduceValues: Map<OpReduce, any> = new Map([
+      [OpReduce.count, 0 as any],
+      [OpReduce.booleanCountIf, 0],
+      [OpReduce.numericSum, 0],
+      [OpReduce.booleanAll, true],
+      [OpReduce.booleanAny, false],
+      [OpReduce.stringConcat, ""]
+    ])
+
     export function reduce(data: Array<string | number | boolean>, op: OpReduce): string | number | boolean {
       if (reduceFunctions.get(op) != undefined) {
-        return data.reduce(reduceFunctions.get(op))
+        return data.reduce(reduceFunctions.get(op), reduceValues.get(op))
       }
     }
 
@@ -214,8 +223,7 @@ namespace SilverField {
           try {
             this.textBinding.setDataAsync(outValue ?? "xx")
             return true
-          }
-          catch (e) {
+          } catch (e) {
             console.error(e)
             return false
           }
