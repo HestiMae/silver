@@ -4,6 +4,7 @@
     "baseUrl": ".",
     "esModuleInterop": true,
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "jsx": "react",
     "noEmitOnError": true,
     "outDir": "lib",

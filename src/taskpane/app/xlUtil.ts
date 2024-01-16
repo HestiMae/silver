@@ -7,7 +7,7 @@ export default class xlUtil {
   static erc = (sr, sc, er, ec) => XLSX.utils.encode_range({ r: sr, c: sc }, { r: er, c: ec });
   static used_range = (s) => XLSX.utils.decode_range(s["!ref"]);
 
-  static filter_sheet(sheet: WorkSheet, header: string, filterValue: string) {
+  static filter_sheet(sheet: WorkSheet, header: string, filterValue: string): number {
     let range = this.used_range(sheet)
     let column = this.range_to_string_array(sheet, this.header_search(sheet, range, "station"), 1);
     let filter_rows: Array<number> = [];
@@ -15,6 +15,7 @@ export default class xlUtil {
     if (filter_rows.length > 0) {
       this.delete_many_rows(sheet, filter_rows)
     }
+    return filter_rows.length
   }
 
   static delete_many_rows(sheet: WorkSheet, row_index: Array<number>) {
